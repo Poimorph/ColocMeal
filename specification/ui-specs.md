@@ -367,24 +367,6 @@ This file contains the headers to be used for the Composable functions in Kotlin
     )
 ```
 
-# Avatar
-
-```Kotlin
-    enum class AvatarSize(val dp: Dp) { 
-        XS(24.dp), 
-        MD(40.dp), 
-        LG(56.dp) 
-        }
-
-    @Composable
-    fun AppAvatar(
-        name: String,
-        userId: String,
-        size: AvatarSize = AvatarSize.MD,
-        modifier: Modifier = Modifier
-    )
-```
-
 # LinearProgressIndicator
 
 ```Kotlin
