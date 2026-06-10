@@ -8,6 +8,7 @@ import com.example.colocmeal.domain.repository.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+// TODO 3.2 : complete remote
 class RecipeRepositoryImpl(
     private val recipeDao: RecipeDao
 ) : RecipeRepository {

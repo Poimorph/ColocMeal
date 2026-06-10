@@ -36,7 +36,7 @@ header-includes: |
     ]
   }
   \AfterEndEnvironment{Highlighting}{\end{tcolorbox}}
-\usepackage{xcolor}
+  \usepackage{xcolor}
   \definecolor{quotebar}{RGB}{99,102,241}
   \definecolor{quotebg}{RGB}{238,239,255}
   \renewenvironment{quote}{%
@@ -186,62 +186,54 @@ ColocMeal is an Android app for flatmates/housemates who want to organize their 
 
 ```kotlin
 data class User(
-    val id: String,          
+    val uid: String,
     val displayName: String,
     val email: String,
-    val photoUrl: String? = null,
-    val houseId: String? = null,
-    val createdAt: Timestamp
+    val houseId: String? = null
 )
 
 data class House(
     val id: String,
     val name: String,
-    val inviteCode: String,    // 6 alphanumeric chars 
+    val inviteCode: String,    // 6 alphanumeric chars
     val creatorId: String,     // creator id
-    val memberIds: List<String>,
-    val createdAt: Timestamp
+    val memberIds: List<String>
 )
 
 data class Recipe(
     val id: String,
     val name: String,
     val description: String? = null,
-    val ingredients: List<String>,  // names only
+    val ingredients: List<String>,   // names only, no quantities
     val authorId: String,
-    val authorName: String,         // denormalized to avoid an extra read
-    val houseId: String? = null,    // null if private recipe
-    val isShared: Boolean = false,
-    val createdAt: Timestamp,
-    val updatedAt: Timestamp
+    val authorName: String,          // denormalized
+    val houseId: String? = null,     // null if private
+    val isShared: Boolean = false    // set at creation, never changes
 )
 
 data class MealPlan(
     val id: String,
     val houseId: String,
-    val weekStart: LocalDate,       // always a Monday
-    val dayOfWeek: Int,             // 1 = Mon ... 7 = Sun
+    val weekStart: LocalDate,        // always Monday
+    val dayOfWeek: Int,              // 1 = Mon ... 7 = Sun
     val recipeId: String,
-    val recipeName: String,        
+    val recipeName: String,          // denormalized
     val cookId: String,
-    val cookName: String,          
-    val updatedAt: Timestamp
+    val cookName: String             // denormalized
 )
 
 data class GroceryItem(
     val id: String,
     val houseId: String,
-    val name: String,                  // displayed name
-    val nameNormalized: String,        // toLowerCase().trim()
+    val name: String,
+    val nameNormalized: String,      // toLowerCase().trim().removeAccents()
     val aisle: Aisle,
     val isChecked: Boolean = false,
-    val checkedBy: String? = null,
-    val checkedByName: String? = null, // denormalized
-    val sourceRecipeIds: List<String>, // recipes that injected this item
-    val addedManually: Boolean = false,
-    val addedBy: String,
-    val addedAt: Timestamp
+    val source: Source,
+    val addedBy: String
 )
+
+enum class Source { AUTO, MANUAL }
 
 enum class Aisle(val displayName: String, val emoji: String) {
     FRUITS_VEGETABLES("Fruits & Vegetables", [emoji]),  // emojis are in Unicode
@@ -258,5 +250,30 @@ enum class Aisle(val displayName: String, val emoji: String) {
 ```
 ## Firebase structure
 
-à définir
+Flat top-level collections, mirroring the data model above. Each document carries the `houseId` it belongs to (when relevant), so house-scoped data is fetched with a `where("houseId", "==", ...)` query rather than nested subcollections.
 
+```
+/users/{userId}
+    -> User (id = Firebase Auth uid)
+
+/houses/{houseId}
+    -> House (id, name, inviteCode, creatorId, memberIds, createdAt)
+
+/recipes/{recipeId}
+    -> Recipe (houseId = null for private recipes, authorId for ownership)
+
+/mealPlans/{mealPlanId}
+    -> MealPlan (houseId, weekStart, dayOfWeek, recipeId, cookId)
+
+/groceryItems/{groceryItemId}
+    -> GroceryItem (houseId, nameNormalized, isChecked, sourceRecipeIds)
+```
+
+### Notes
+- `houseId` is the main partition key: queries for recipes, meal plans and grocery items always filter on it (`recipes` additionally filter on `authorId` for private recipes).
+- `inviteCode` lookup (UC-02) requires a single-field index on `houses.inviteCode`.
+- Real-time sync (planning, shopping list) uses Firestore snapshot listeners (`addSnapshotListener`) on the `mealPlans` and `groceryItems` collections, scoped by `houseId`.
+- The Firestore document ID *is* the entity's `id` (e.g. `users/{uid}` doc ID = Firebase Auth uid), so `id` is not stored as a field inside the document — avoids keeping it in sync.
+- House members (avatars, cook picker): no extra collection or denormalized member list needed. Fetch `users` docs directly with `whereIn(FieldPath.documentId(), house.memberIds)` (Firestore supports up to 30 IDs per query — plenty for a flatshare).
+- Denormalized fields (`authorName`, `cookName`, `checkedByName`) avoid extra reads when displaying lists.
+- Room stays as a local cache/offline layer: Firestore listeners write through to Room, and the UI reads from Room (single source of truth on-device).

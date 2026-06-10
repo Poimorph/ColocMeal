@@ -8,6 +8,7 @@ import com.example.colocmeal.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+// TODO 4.2 : complete remote
 class UserRepositoryImpl(
     private val userDao: UserDao
 ) : UserRepository {

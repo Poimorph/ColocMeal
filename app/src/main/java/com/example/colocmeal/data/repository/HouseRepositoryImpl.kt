@@ -8,7 +8,7 @@ import com.example.colocmeal.domain.repository.HouseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-
+// TODO 1.2 : complete remote
 class HouseRepositoryImpl(
     private val houseDao: HouseDao
 ) : HouseRepository {

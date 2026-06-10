@@ -22,6 +22,9 @@ interface RecipeDao {
     @Upsert
     suspend fun upsert(recipe: RecipeEntity)
 
+    @Upsert
+    suspend fun upsertAll(recipes: List<RecipeEntity>)
+
     @Delete
     suspend fun delete(recipe: RecipeEntity)
 }
