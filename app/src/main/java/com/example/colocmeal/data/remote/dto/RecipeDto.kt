@@ -7,4 +7,6 @@ data class RecipeDto(
     val ingredients: List<String> = emptyList(),
     val authorId: String = "",
     val authorName: String = "",
+    val houseId: String = "",     // null if private
+    val isShared: String = "false"    // set at creation, never changes
 )

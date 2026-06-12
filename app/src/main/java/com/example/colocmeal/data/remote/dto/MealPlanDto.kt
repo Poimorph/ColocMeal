@@ -11,4 +11,6 @@ data class MealPlanDto(
     val dayOfWeek: String = "",
     val recipeId: String = "",
     val recipeName: String = "",
+    val cookId: String = "",
+    val cookName : String = ""
 )
