@@ -22,7 +22,7 @@ class GroceryRepositoryImpl(
 
     fun startSync(houseId:String){
         scope.launch {
-            remote.observerItems(houseId).collect{
+            remote.observeItems(houseId).collect{
                     dtos->
                 groceryItemDao.upsertAll( dtos.map{it.toDomain().toEntity() })
             }

@@ -1,7 +1,9 @@
 package com.example.colocmeal.data.remote.dto
 
+import com.google.firebase.firestore.Exclude
+
 data class RecipeDto(
-    val id: String = "",
+    @get: Exclude val id: String = "",
     val name: String = "",
     val description: String? = "",
     val ingredients: List<String> = emptyList(),

@@ -12,7 +12,7 @@ class GroceryFirestoreDataSource(
 ) {
     private val collection = firestore.collection("groceryItems")
 
-    fun observerItems(houseId:String): Flow<List<GroceryItemDto>> =
+    fun observeItems(houseId:String): Flow<List<GroceryItemDto>> =
         callbackFlow {
             val registration = collection
                 .whereEqualTo("houseId", houseId)

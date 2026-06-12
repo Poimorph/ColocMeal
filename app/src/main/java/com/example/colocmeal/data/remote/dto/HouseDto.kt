@@ -1,7 +1,9 @@
 package com.example.colocmeal.data.remote.dto
 
+import com.google.firebase.firestore.Exclude
+
 data class HouseDto (
-    val id: String = "",
+    @get: Exclude val id: String = "",
     val name: String = "",
     val inviteCode: String = "",
     val creatorId: String = "",
