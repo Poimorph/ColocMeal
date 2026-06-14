@@ -20,6 +20,9 @@ interface MealPlanDao {
     @Upsert
     suspend fun upsert(mealPlan: MealPlanEntity)
 
+    @Upsert
+    suspend fun upsertAll(meals: List<MealPlanEntity>)
+
     @Delete
     suspend fun delete(mealPlan: MealPlanEntity)
 }

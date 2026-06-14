@@ -19,6 +19,9 @@ interface HouseDao {
     @Upsert
     suspend fun upsert(house: HouseEntity)
 
+    @Upsert
+    suspend fun upsertAll(houses: List<HouseEntity>)
+
     @Delete
     suspend fun delete(house: HouseEntity)
 }

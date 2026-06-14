@@ -19,6 +19,9 @@ interface GroceryItemDao {
     @Upsert
     suspend fun upsert(item: GroceryItemEntity)
 
+    @Upsert
+    suspend fun upsertAll(items: List<GroceryItemEntity>)
+
     @Query("UPDATE grocery_items SET isChecked = :isChecked WHERE id = :id")
     suspend fun setChecked(id: String, isChecked: Boolean)
 
