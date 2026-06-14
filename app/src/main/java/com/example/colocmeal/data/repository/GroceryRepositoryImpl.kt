@@ -5,6 +5,7 @@ import com.example.colocmeal.data.mapper.toDomain
 import com.example.colocmeal.data.mapper.toDto
 import com.example.colocmeal.data.mapper.toEntity
 import com.example.colocmeal.data.remote.GroceryFirestoreDataSource
+import com.example.colocmeal.di.FirebaseProvider
 import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.repository.GroceryRepository
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,7 @@ import java.util.UUID
 
 class GroceryRepositoryImpl(
     private val groceryItemDao: GroceryItemDao,
-    private val remote: GroceryFirestoreDataSource,
+    private val remote: GroceryFirestoreDataSource = GroceryFirestoreDataSource(FirebaseProvider.firestore),
     private val scope: CoroutineScope
 ) : GroceryRepository {
 

@@ -5,6 +5,7 @@ import com.example.colocmeal.data.mapper.toDomain
 import com.example.colocmeal.data.mapper.toDto
 import com.example.colocmeal.data.mapper.toEntity
 import com.example.colocmeal.data.remote.HouseFirestoreDataSource
+import com.example.colocmeal.di.FirebaseProvider
 import com.example.colocmeal.domain.model.House
 import com.example.colocmeal.domain.repository.HouseRepository
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 // TODO 1.2 : complete remote
 class HouseRepositoryImpl(
     private val houseDao: HouseDao,
-    private val remote : HouseFirestoreDataSource,
+    private val remote : HouseFirestoreDataSource = HouseFirestoreDataSource(FirebaseProvider.firestore),
     private val scope: CoroutineScope
 ) : HouseRepository {
 
