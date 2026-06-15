@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
-    @Query("SELECT * FROM users WHERE id = :id")
+    @Query("SELECT * FROM users WHERE uid = :id")
     fun getUserById(id: String): Flow<UserEntity?>
 
     @Upsert
     suspend fun upsert(user: UserEntity)
 
-    @Query("UPDATE users SET houseId = :houseId WHERE id = :id")
+    @Query("UPDATE users SET houseId = :houseId WHERE uid = :id")
     suspend fun updateHouseId(id: String, houseId: String?)
 
     @Delete

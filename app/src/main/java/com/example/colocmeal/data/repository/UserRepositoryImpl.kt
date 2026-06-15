@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class UserRepositoryImpl(
     private val userDao: UserDao,
-    private val remote: UserFirestoreDataSource =  UserFirestoreDataSource(FirebaseProvider.firestore),
+    private val remote: UserFirestoreDataSource,
     private val scope: CoroutineScope
 ) : UserRepository {
 

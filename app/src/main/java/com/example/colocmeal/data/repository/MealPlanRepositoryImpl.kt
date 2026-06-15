@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 class MealPlanRepositoryImpl(
     private val mealPlanDao: MealPlanDao,
-    private val remote: MealFirestoreDataSource=MealFirestoreDataSource(FirebaseProvider.firestore),
+    private val remote: MealFirestoreDataSource,
     private val scope: CoroutineScope
 ) : MealPlanRepository {
 

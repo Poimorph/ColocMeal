@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class RecipeRepositoryImpl(
     private val recipeDao: RecipeDao,
-    private val remote: RecipeFirestoreDataSource = RecipeFirestoreDataSource(FirebaseProvider.firestore),
+    private val remote: RecipeFirestoreDataSource,
     private val scope: CoroutineScope
 ) : RecipeRepository {
 

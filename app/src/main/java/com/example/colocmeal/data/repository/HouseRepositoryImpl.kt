@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 // TODO 1.2 : complete remote
 class HouseRepositoryImpl(
     private val houseDao: HouseDao,
-    private val remote : HouseFirestoreDataSource = HouseFirestoreDataSource(FirebaseProvider.firestore),
+    private val remote : HouseFirestoreDataSource,
     private val scope: CoroutineScope
 ) : HouseRepository {
 

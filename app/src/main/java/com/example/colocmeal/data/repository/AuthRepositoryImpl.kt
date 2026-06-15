@@ -1,0 +1,40 @@
+package com.example.colocmeal.data.repository
+
+import com.example.colocmeal.di.FirebaseProvider
+import com.example.colocmeal.domain.model.User
+import com.example.colocmeal.domain.repository.AuthRepository
+import com.example.colocmeal.domain.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+
+
+class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepository): AuthRepository {
+    override fun authState(): Flow<String?> = callbackFlow { auth.addAuthStateListener { trySend(it.currentUser?.uid) } }
+
+    override suspend fun signUp(
+        email: String,
+        password: String,
+        displayName: String
+    ): Result<String> {
+        try {
+            val result = auth.createUserWithEmailAndPassword(email,password).await()
+            val uid = result.user!!.uid
+            userRepository.upsertUser(User(uid,displayName,email,houseId = null))
+            return Result.success(uid)
+        }catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun signIn(email: String, password: String): Result<String> {
+        try {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            return Result.success(result.user!!.uid)
+        }catch (e: Exception) {
+            return Result.failure(e)
+        }
+
+    }
+}

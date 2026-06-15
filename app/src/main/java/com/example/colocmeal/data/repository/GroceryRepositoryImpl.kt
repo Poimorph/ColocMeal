@@ -17,7 +17,7 @@ import java.util.UUID
 
 class GroceryRepositoryImpl(
     private val groceryItemDao: GroceryItemDao,
-    private val remote: GroceryFirestoreDataSource = GroceryFirestoreDataSource(FirebaseProvider.firestore),
+    private val remote: GroceryFirestoreDataSource,
     private val scope: CoroutineScope
 ) : GroceryRepository {
 
