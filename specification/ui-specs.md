@@ -452,14 +452,3 @@ This file contains the headers to be used for the Composable functions in Kotlin
         modifier: Modifier = Modifier
     )
 ```
-
-# CameraViewFinder
-
-```Kotlin
-    @Composable
-    fun CameraViewFinder(
-        isScanning: Boolean,
-        size: DpSize = DpSize(260.dp, 144.dp),
-        modifier: Modifier = Modifier
-    )
-```

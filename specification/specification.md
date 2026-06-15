@@ -117,8 +117,9 @@ ColocMeal is an Android app for flatmates/housemates who want to organize their 
 - [ ] Automatic shopping list generation from the planning
 - [ ] List organized by aisles
 - [ ] Automatic deduplication of merged ingredients
-- [ ] Manual item addition (text search or barcode scan)
+- [ ] Manual item addition (text search)
 - [ ] Mark item as bought (real-time sync)
+- [ ] Shake the phone (on the Shopping tab) to mark all items bought & clear them
 - [ ] Compose animations (transitions, check anim, progress)
 - [ ] A weekly report on what and who bought groceries
 
@@ -171,14 +172,16 @@ ColocMeal is an Android app for flatmates/housemates who want to organize their 
 | **Nominal flow** | 1. Open Shopping tab -> 2. See items grouped by aisle -> 3. Check items as you go -> 4. (Optional) Tap "Clear bought items" at the end |
 | **Sync** | Each check is propagated in < 1 s to other members |
 
-## UC-05 — Scan a product
+## UC-05 — Shake to clear the shopping list
 
 | Field | Value |
 |---|---|
 | **Actor** | Any member |
-| **Precondition** | Camera permission granted |
-| **Nominal flow** | 1. Tap scan button -> 2. CameraX opens -> 3. Scan an EAN-13 -> 4. Open Food Facts call -> 5. Name and aisle pre-filled -> 6. Confirm and add |
-| **Error case** | Product not found: manual form; permission denied: explanatory message + link to Settings |
+| **Precondition** | On the Shopping tab with at least one item |
+| **Trigger** | Physically shake the phone |
+| **Nominal flow** | 1. Shake detected (accelerometer) -> 2. All items animate to "bought" -> 3. All items are removed from the list -> 4. Undo snackbar shown briefly |
+| **Postcondition** | The house's shopping list is emptied; change syncs to other members |
+| **Error case** | Empty list: shake ignored (no-op) |
 
 # Data model
 
