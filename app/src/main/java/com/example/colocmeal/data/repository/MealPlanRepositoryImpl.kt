@@ -20,7 +20,7 @@ class MealPlanRepositoryImpl(
     private val scope: CoroutineScope
 ) : MealPlanRepository {
 
-    fun startSync(houseId: String, weekStart: LocalDate) {
+    override fun startSync(houseId: String, weekStart: LocalDate) {
         scope.launch {
             remote.observeWeek(houseId, weekStart.toString()).collect { dtos ->
                 mealPlanDao.upsertAll(dtos.map { it.toDomain().toEntity() })

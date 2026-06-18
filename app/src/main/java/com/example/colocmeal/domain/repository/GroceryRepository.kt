@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface GroceryRepository {
 
+    fun startSync(houseId: String)
+
     fun observeItems(houseId: String): Flow<List<GroceryItem>>
 
     suspend fun addOrMergeItem(item: GroceryItem)

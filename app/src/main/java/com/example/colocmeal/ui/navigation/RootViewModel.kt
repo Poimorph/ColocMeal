@@ -28,15 +28,24 @@ class RootViewModel(
     userRepository: UserRepository
 ) : ViewModel(){
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    // Guard so we only start the (non-idempotent) user sync once per uid.
+    private var syncedUid: String? = null
+
     val state: StateFlow<RootState> =
         authRepository.authState()
             .flatMapLatest { uid ->
                 if (uid == null) flowOf(RootState.SignedOut)
-                else userRepository.observeUser(uid).map { user ->
-                    when {
-                        user?.houseId != null -> RootState.Ready(uid, user.houseId)
-                        else                   -> RootState.NeedsHouse(uid)
+                else {
+                    // Mirror /users/{uid} into Room so houseId changes propagate (UC-01/02).
+                    if (syncedUid != uid) {
+                        syncedUid = uid
+                        userRepository.startSync(uid)
+                    }
+                    userRepository.observeUser(uid).map { user ->
+                        when {
+                            user?.houseId != null -> RootState.Ready(uid, user.houseId)
+                            else                   -> RootState.NeedsHouse(uid)
+                        }
                     }
                 }
             }
