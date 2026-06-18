@@ -5,13 +5,24 @@ import com.example.colocmeal.domain.model.User
 import com.example.colocmeal.domain.repository.AuthRepository
 import com.example.colocmeal.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 
 class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepository): AuthRepository {
-    override fun authState(): Flow<String?> = callbackFlow { auth.addAuthStateListener { trySend(it.currentUser?.uid) } }
+
+    override val currentUid: String?
+        get() = auth.currentUser?.uid
+
+    override fun authState(): Flow<String?> = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { trySend(it.currentUser?.uid) }
+        auth.addAuthStateListener(listener)
+        awaitClose { auth.removeAuthStateListener(listener) }
+    }
+
+    override fun signOut() = auth.signOut()
 
     override suspend fun signUp(
         email: String,
@@ -35,6 +46,7 @@ class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepos
         }catch (e: Exception) {
             return Result.failure(e)
         }
-
     }
+
+
 }
