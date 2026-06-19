@@ -77,9 +77,12 @@ class GroceryItemDaoTest {
         val itemA = item("g1", isChecked = false)
         dao.upsert(itemA)
 
-        dao.setChecked("g1", true)
+        dao.setChecked("g1", true, "Alice")
 
-        assertEquals(itemA.copy(isChecked = true), dao.getItemsForHouse("h1").first().single())
+        assertEquals(
+            itemA.copy(isChecked = true, checkedByName = "Alice"),
+            dao.getItemsForHouse("h1").first().single()
+        )
     }
 
     @Test

@@ -9,17 +9,20 @@ import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.model.Source
 import com.example.colocmeal.domain.repository.AuthRepository
 import com.example.colocmeal.domain.repository.GroceryRepository
+import com.example.colocmeal.domain.repository.UserRepository
 import com.example.colocmeal.domain.utils.normalizeName
 import com.example.colocmeal.ui.container
 import com.example.colocmeal.ui.launchSafe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 
 class GroceryViewModel(
     private val houseId: String,
     private val repository: GroceryRepository,
     private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     val items: StateFlow<List<GroceryItem>> =
@@ -47,7 +50,15 @@ class GroceryViewModel(
 
     fun toggleItemChecked(itemId: String, isChecked: Boolean) {
         val item = items.value.find { it.id == itemId } ?: return
-        launchSafe { repository.setChecked(item, isChecked) }
+        launchSafe {
+            val name = currentUserName()
+            repository.setChecked(item, isChecked, name)
+        }
+    }
+
+    private suspend fun currentUserName(): String {
+        val uid = authRepository.currentUid ?: return ""
+        return userRepository.observeUser(uid).first()?.displayName.orEmpty()
     }
 
     fun deleteItem(itemId: String) {
@@ -58,7 +69,12 @@ class GroceryViewModel(
     companion object {
         fun factory(houseId: String) = viewModelFactory {
             initializer {
-                GroceryViewModel(houseId, container().groceryRepository, container().authRepository)
+                GroceryViewModel(
+                    houseId,
+                    container().groceryRepository,
+                    container().authRepository,
+                    container().userRepository,
+                )
             }
         }
     }

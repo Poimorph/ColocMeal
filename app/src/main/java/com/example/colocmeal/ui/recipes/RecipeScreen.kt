@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.colocmeal.domain.model.Aisle
 import com.example.colocmeal.domain.model.Ingredient
+import com.example.colocmeal.ui.components.grocery.AisleSelector
 import com.example.colocmeal.ui.components.grocery.AppChip
 import com.example.colocmeal.ui.components.buttons.AppSwitch
 import com.example.colocmeal.ui.components.navigation.AppTopAppBar
@@ -164,19 +165,10 @@ fun AddRecipeDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Aisle.entries.forEach { aisle ->
-                        AppChip(
-                            label = "${aisle.emoji} ${aisle.displayName}",
-                            kind = ChipKind.FILTER,
-                            selected = aisle == draftAisle,
-                            onClick = { draftAisle = aisle }
-                        )
-                    }
-                }
+                AisleSelector(
+                    selected = draftAisle,
+                    onSelect = { draftAisle = it }
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 AppButton(
                     label = "Ajouter l'ingrédient",

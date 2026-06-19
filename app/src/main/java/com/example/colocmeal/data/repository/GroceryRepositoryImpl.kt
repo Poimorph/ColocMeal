@@ -40,9 +40,10 @@ class GroceryRepositoryImpl(
         groceryItemDao.upsert(toInsert.toEntity())
         remote.upsert(toInsert.toDto())
     }
-    override suspend fun setChecked(item: GroceryItem, checked: Boolean) {
-        groceryItemDao.setChecked(item.id, checked)
-        remote.upsert(item.copy(isChecked = checked).toDto())
+    override suspend fun setChecked(item: GroceryItem, checked: Boolean, checkedByName: String) {
+        val who = if (checked) checkedByName else ""
+        groceryItemDao.setChecked(item.id, checked, who)
+        remote.setChecked(item.id, checked, who)
     }
 
     override suspend fun deleteItem(item: GroceryItem) {

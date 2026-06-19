@@ -11,7 +11,7 @@ interface GroceryRepository {
 
     suspend fun addOrMergeItem(item: GroceryItem)
 
-    suspend fun setChecked(item: GroceryItem, checked: Boolean)
+    suspend fun setChecked(item: GroceryItem, checked: Boolean, checkedByName: String)
 
     suspend fun deleteItem(item: GroceryItem)
 

@@ -27,7 +27,7 @@ import com.example.colocmeal.data.local.entity.UserEntity
         GroceryItemEntity::class,
         IngredientEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

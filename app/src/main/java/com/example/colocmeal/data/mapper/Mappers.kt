@@ -183,6 +183,7 @@ fun GroceryItemEntity.toDomain(): GroceryItem = GroceryItem(
     nameNormalized = nameNormalized,
     aisle = aisle,
     isChecked = isChecked,
+    checkedByName = checkedByName,
     source = source,
     addedBy = addedBy
 )
@@ -194,6 +195,7 @@ fun GroceryItem.toEntity(): GroceryItemEntity = GroceryItemEntity(
     nameNormalized = nameNormalized,
     aisle = aisle,
     isChecked = isChecked,
+    checkedByName = checkedByName,
     source = source,
     addedBy = addedBy
 )
@@ -205,6 +207,7 @@ fun GroceryItemDto.toDomain(): GroceryItem = GroceryItem(
     nameNormalized = nameNormalized,
     aisle = Aisle.valueOf(aisle),
     isChecked = isChecked,
+    checkedByName = checkedByName,
     source = Source.valueOf(source),
     addedBy = addedBy
 )
@@ -216,6 +219,7 @@ fun GroceryItem.toDto(): GroceryItemDto = GroceryItemDto(
     nameNormalized = nameNormalized,
     aisle = aisle.name,
     isChecked = isChecked,
+    checkedByName = checkedByName,
     source = source.name,
     addedBy = addedBy
 )

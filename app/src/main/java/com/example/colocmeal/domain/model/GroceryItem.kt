@@ -7,6 +7,7 @@ data class GroceryItem(
     val nameNormalized: String,      // toLowerCase().trim().removeAccents()
     val aisle: Aisle,
     val isChecked: Boolean = false,
+    val checkedByName: String = "",   // denormalized display name of whoever checked it
     val source: Source,
     val addedBy: String
 )

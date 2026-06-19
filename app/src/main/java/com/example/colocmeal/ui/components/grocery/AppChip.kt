@@ -25,7 +25,8 @@ fun AppChip(
     selected: Boolean = false,
     onClick: () -> Unit = {},
     leadingIcon: ImageVector? = null,
-    onDismiss: (() -> Unit)? = null // only INPUT
+    onDismiss: (() -> Unit)? = null, // only INPUT
+    modifier: Modifier = Modifier
 ) {
     val leading: (@Composable () -> Unit)? = leadingIcon?.let {
         { Icon(it, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
@@ -36,6 +37,7 @@ fun AppChip(
             onClick = onClick,
             label = { Text(label) },
             leadingIcon = leading,
+            modifier = modifier,
             trailingIcon = onDismiss?.let {
                 {
                     Icon(
@@ -53,18 +55,21 @@ fun AppChip(
             selected = selected,
             onClick = onClick,
             label = { Text(label) },
-            leadingIcon = leading
+            leadingIcon = leading,
+            modifier = modifier
         )
 
         ChipKind.ASSIST -> AssistChip(
             onClick = onClick,
             label = { Text(label) },
-            leadingIcon = leading
+            leadingIcon = leading,
+            modifier = modifier
         )
 
         ChipKind.CATEGORY -> SuggestionChip(
             onClick = onClick,
-            label = { Text(label) }
+            label = { Text(label) },
+            modifier = modifier
         )
     }
 }

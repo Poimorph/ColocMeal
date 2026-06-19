@@ -30,6 +30,12 @@ class GroceryFirestoreDataSource(
         collection.document(item.id).set(item).await()
     }
 
+    suspend fun setChecked(itemId: String, checked: Boolean, checkedByName: String) {
+        collection.document(itemId)
+            .update(mapOf("isChecked" to checked, "checkedByName" to checkedByName))
+            .await()
+    }
+
     suspend fun  delete(itemId: String) {
         collection.document(itemId).delete().await()
     }

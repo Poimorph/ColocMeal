@@ -17,6 +17,7 @@ data class GroceryItemEntity(
     val nameNormalized: String,
     val aisle: Aisle,
     val isChecked: Boolean = false,
+    val checkedByName: String = "",
     val source: Source,
     val addedBy: String
 )
