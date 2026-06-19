@@ -13,5 +13,6 @@ interface HouseRepository {
     suspend fun upsertHouse(house: House)
 
     suspend fun addMember(houseId: String, userId: String)
+    suspend fun removeMember(houseId: String, userId: String)
     fun startSync(houseId: String)
 }

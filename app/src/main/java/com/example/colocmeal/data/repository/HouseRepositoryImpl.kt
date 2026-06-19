@@ -55,4 +55,8 @@ class HouseRepositoryImpl(
     override suspend fun addMember(houseId: String, userId: String) {
         remote.addMember(houseId, userId)
     }
+
+    override suspend fun removeMember(houseId: String, userId: String) {
+        remote.removeMember(houseId, userId)
+    }
 }

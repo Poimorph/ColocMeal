@@ -53,5 +53,6 @@ class GroceryRepositoryImpl(
 
     override suspend fun clearChecked(houseId: String) {
         groceryItemDao.deleteCheckedForHouse(houseId)
+        remote.deleteChecked(houseId)
     }
 }

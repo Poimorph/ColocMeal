@@ -39,4 +39,17 @@ class GroceryFirestoreDataSource(
     suspend fun  delete(itemId: String) {
         collection.document(itemId).delete().await()
     }
+
+    /** Batch-delete every checked item of a house so it does not resync back. */
+    suspend fun deleteChecked(houseId: String) {
+        val snapshot = collection
+            .whereEqualTo("houseId", houseId)
+            .whereEqualTo("isChecked", true)
+            .get()
+            .await()
+        if (snapshot.isEmpty) return
+        val batch = firestore.batch()
+        snapshot.documents.forEach { batch.delete(it.reference) }
+        batch.commit().await()
+    }
 }

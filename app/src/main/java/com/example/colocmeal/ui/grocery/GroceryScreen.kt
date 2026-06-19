@@ -1,5 +1,6 @@
 package com.example.colocmeal.ui.grocery
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,19 +37,59 @@ fun GroceryScreen(
     viewModel: GroceryViewModel = viewModel(factory = GroceryViewModel.factory(houseId))
 ) {
     val items by viewModel.items.collectAsState()
+    val lastCleared by viewModel.lastCleared.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var showHouseInfo by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     val total = items.size
     val bought = items.count { it.isChecked }
 
+    // Shake the phone on this tab to mark everything bought and clear it (UC-05).
+    rememberShake { viewModel.onShakeClear() }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(lastCleared) {
+        if (lastCleared.isNotEmpty()) {
+            val result = snackbarHostState.showSnackbar(
+                message = "${lastCleared.size} item(s) cleared",
+                actionLabel = "Undo",
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.undoClear()
+            } else {
+                viewModel.consumeLastCleared()
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(house?.name ?: "Grocery") },
                 actions = {
                     IconButton(onClick = { showHouseInfo = true }) {
                         Icon(Icons.Default.Info, contentDescription = "House info")
+                    }
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Clear bought items") },
+                                enabled = bought > 0,
+                                onClick = {
+                                    showMenu = false
+                                    viewModel.clearBought()
+                                }
+                            )
+                        }
                     }
                 }
             )
@@ -183,8 +225,12 @@ fun GroceryItemRow(
     onToggle: (Boolean) -> Unit,
     onDelete: () -> Unit
 ) {
+    val checkedAlpha by animateFloatAsState(
+        targetValue = if (item.isChecked) 0.5f else 1f,
+        label = "itemAlpha"
+    )
     ListItem(
-        modifier = Modifier.alpha(if (item.isChecked) 0.5f else 1f),
+        modifier = Modifier.alpha(checkedAlpha),
         headlineContent = {
             Text(
                 text = item.name,

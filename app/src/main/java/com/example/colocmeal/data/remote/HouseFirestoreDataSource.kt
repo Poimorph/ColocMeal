@@ -46,4 +46,8 @@ class HouseFirestoreDataSource (
         collection.document(houseId).update("memberIds", FieldValue.arrayUnion(userId)).await()
     }
 
+    suspend fun removeMember(houseId: String, userId: String){
+        collection.document(houseId).update("memberIds", FieldValue.arrayRemove(userId)).await()
+    }
+
 }
