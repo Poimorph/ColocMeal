@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 
 enum class ButtonStyle { FILLED, TONAL, OUTLINED, TEXT, ELEVATED }
 
@@ -26,5 +28,23 @@ fun AppButton(
         }else{
             CircularProgressIndicator(Modifier.size(16.dp))
         }
+    }
+}
+
+@Composable
+fun AppFab(
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription
+        )
     }
 }
