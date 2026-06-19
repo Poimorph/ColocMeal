@@ -1,6 +1,5 @@
 package com.example.colocmeal.data.repository
 
-import com.example.colocmeal.di.FirebaseProvider
 import com.example.colocmeal.domain.model.User
 import com.example.colocmeal.domain.repository.AuthRepository
 import com.example.colocmeal.domain.repository.UserRepository
@@ -10,6 +9,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
+class AuthRepositoryImpl(
+    private val auth: FirebaseAuth,
+    private val userRepository: UserRepository
+) : AuthRepository {
 
 class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepository): AuthRepository {
 
@@ -17,35 +20,55 @@ class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepos
         get() = auth.currentUser?.uid
 
     override fun authState(): Flow<String?> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { trySend(it.currentUser?.uid) }
-        auth.addAuthStateListener(listener)
-        awaitClose { auth.removeAuthStateListener(listener) }
-    }
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            trySend(firebaseAuth.currentUser?.uid)
+        }
 
-    override fun signOut() = auth.signOut()
+        auth.addAuthStateListener(listener)
+
+        awaitClose {
+            auth.removeAuthStateListener(listener)
+        }
+    }
 
     override suspend fun signUp(
         email: String,
         password: String,
         displayName: String
     ): Result<String> {
-        try {
-            val result = auth.createUserWithEmailAndPassword(email,password).await()
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
             val uid = result.user!!.uid
-            userRepository.upsertUser(User(uid,displayName,email,houseId = null))
-            return Result.success(uid)
-        }catch (e: Exception) {
-            return Result.failure(e)
+
+            userRepository.upsertUser(
+                User(
+                    uid = uid,
+                    displayName = displayName,
+                    email = email,
+                    houseId = null
+                )
+            )
+
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    override suspend fun signIn(email: String, password: String): Result<String> {
-        try {
+    override suspend fun signIn(
+        email: String,
+        password: String
+    ): Result<String> {
+        return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            return Result.success(result.user!!.uid)
-        }catch (e: Exception) {
-            return Result.failure(e)
+            Result.success(result.user!!.uid)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
+
+    override fun signOut() {
+        auth.signOut()
     }
 
 
