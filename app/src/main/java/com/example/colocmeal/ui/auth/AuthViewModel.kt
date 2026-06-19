@@ -1,7 +1,5 @@
 package com.example.colocmeal.ui.auth
 
-import android.util.Patterns
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -14,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.example.colocmeal.ui.container
 
+private val EMAIL_REGEX = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
 
 data class AuthUiState(
     val email: String = "",
@@ -67,7 +66,7 @@ class AuthViewModel(
 
     /** Returns an error message, or null if valid. */
     private fun validate(s: AuthUiState, requireName: Boolean): String? = when {
-        !Patterns.EMAIL_ADDRESS.matcher(s.email.trim()).matches() -> "Enter a valid email."
+        !EMAIL_REGEX.matches(s.email.trim()) -> "Enter a valid email."
         s.password.length < 6 -> "Password must be at least 6 characters."
         requireName && s.displayName.isBlank() -> "Enter a display name."
         else -> null

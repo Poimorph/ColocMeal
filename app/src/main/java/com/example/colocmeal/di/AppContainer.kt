@@ -37,4 +37,6 @@ class AppContainer(context: Context) {
     val mealPlanRepository : MealPlanRepository = MealPlanRepositoryImpl(db.mealPlanDao(),MealFirestoreDataSource(firestore), appScope)
     val groceryRepository : GroceryRepository = GroceryRepositoryImpl(db.groceryItemDao(),GroceryFirestoreDataSource(firestore), appScope)
     val authRepository: AuthRepository = AuthRepositoryImpl(auth, userRepository)
+
+    val houseSession = HouseSession(this)
 }

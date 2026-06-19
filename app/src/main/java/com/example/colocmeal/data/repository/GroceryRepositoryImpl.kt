@@ -21,7 +21,7 @@ class GroceryRepositoryImpl(
     private val scope: CoroutineScope
 ) : GroceryRepository {
 
-    fun startSync(houseId:String){
+    override fun startSync(houseId:String){
         scope.launch {
             remote.observeItems(houseId).collect{
                     dtos->

@@ -8,6 +8,7 @@ enum class Aisle(val displayName: String, val emoji: String) {
     GROCERY("Pantry", "🥫"),
     BAKERY("Bakery", "🥖"),
     DRINKS("Drinks", "🥤"),
+    HYGIENE("Hygiene & Cleaning", "🧼"),
     FROZEN("Frozen", "🧊"),
     OTHER("Other", "📦")
 }

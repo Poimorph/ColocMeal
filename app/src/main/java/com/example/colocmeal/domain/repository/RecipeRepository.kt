@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecipeRepository {
 
+    fun startSync(houseId: String, authorId: String?)
+
     fun observeSharedRecipes(houseId: String): Flow<List<Recipe>>
 
     fun observePrivateRecipes(authorId: String): Flow<List<Recipe>>

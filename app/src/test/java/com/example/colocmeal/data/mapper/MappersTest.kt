@@ -23,7 +23,7 @@ class MappersTest {
         val user = User(uid = "u1", displayName = "Alice", email = "alice@test.com", houseId = "h1")
 
         assertEquals(user, user.toEntity().toDomain())
-        val entity = UserEntity(id = "u2", displayName = "Bob", email = "bob@test.com", houseId = null)
+        val entity = UserEntity(uid = "u2", displayName = "Bob", email = "bob@test.com", houseId = null)
         assertEquals(entity, entity.toDomain().toEntity())
     }
 

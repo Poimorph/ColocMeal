@@ -8,6 +8,7 @@ import com.example.colocmeal.data.remote.HouseFirestoreDataSource
 import com.example.colocmeal.di.FirebaseProvider
 import com.example.colocmeal.domain.model.House
 import com.example.colocmeal.domain.repository.HouseRepository
+import com.example.colocmeal.domain.utils.InviteCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -22,7 +23,7 @@ class HouseRepositoryImpl(
     private val scope: CoroutineScope
 ) : HouseRepository {
 
-    fun startSync(houseId: String){
+    override fun startSync(houseId: String){
         scope.launch {
             remote.observeHouse(houseId).collect{
                 dto ->
@@ -31,9 +32,17 @@ class HouseRepositoryImpl(
         }
     }
 
+    override suspend fun generateUniqueInviteCode(maxAttempts: Int) : String {
+        repeat(maxAttempts) {
+            val code = InviteCode.generate()
+            if (getHouseByInviteCode(code) == null) return code
+        }
+        error("Could not generate a unique invite after $maxAttempts attempts")
+    }
 
     override fun observeHouse(id: String): Flow<House?> =
         houseDao.getHouseById(id).map { it?.toDomain() }
+
 
     override suspend fun getHouseByInviteCode(inviteCode: String): House? =
         remote.getByInviteCode(inviteCode)?.toDomain()

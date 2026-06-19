@@ -6,6 +6,8 @@ import java.time.LocalDate
 
 interface MealPlanRepository {
 
+    fun startSync(houseId: String, weekStart: LocalDate)
+
     fun observeWeek(houseId: String, weekStart: LocalDate): Flow<List<MealPlan>>
 
     suspend fun upsertMealPlan(mealPlan: MealPlan)

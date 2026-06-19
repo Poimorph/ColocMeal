@@ -19,13 +19,13 @@ class RecipeRepositoryImpl(
     private val scope: CoroutineScope
 ) : RecipeRepository {
 
-    fun startSync(houseId: String, authorId: String) {
+    override fun startSync(houseId: String, authorId: String?) {
         scope.launch {
             remote.observeSharedRecipes(houseId).collect { dtos ->
                 recipeDao.upsertAll(dtos.map { it.toDomain().toEntity() })
             }
         }
-        scope.launch {
+        if (authorId != null) scope.launch {
             remote.observePrivateRecipes(authorId).collect { dtos ->
                 recipeDao.upsertAll(dtos.map { it.toDomain().toEntity() })
             }

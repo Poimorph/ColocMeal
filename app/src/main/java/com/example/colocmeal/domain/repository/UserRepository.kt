@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
+    fun startSync(uid: String)
+
     fun observeUser(uid: String): Flow<User?>
 
     suspend fun upsertUser(user: User)

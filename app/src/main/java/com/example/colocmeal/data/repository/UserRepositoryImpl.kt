@@ -19,7 +19,7 @@ class UserRepositoryImpl(
     private val scope: CoroutineScope
 ) : UserRepository {
 
-    fun startSync(uid: String) {
+    override fun startSync(uid: String) {
         scope.launch {
             remote.observeUser(uid).collect { dto ->
                 if (dto != null) userDao.upsert(dto.toDomain().toEntity())
