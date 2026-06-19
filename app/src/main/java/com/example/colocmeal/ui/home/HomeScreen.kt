@@ -19,9 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.colocmeal.domain.model.House
 import com.example.colocmeal.ui.components.AppNavigationBar
 import com.example.colocmeal.ui.components.AppTopAppBar
 import com.example.colocmeal.ui.components.NavDestination
+import com.example.colocmeal.ui.grocery.GroceryScreen
+import com.example.colocmeal.ui.planning.MealPlanScreen
+import com.example.colocmeal.ui.recipes.RecipeScreen
 
 @Composable
 fun HomeScreen(
@@ -39,12 +43,6 @@ fun HomeScreen(
     var current by remember { mutableStateOf(destinations.first().route) }
 
     Scaffold(
-        topBar = {
-            AppTopAppBar(
-                title = house?.name ?: "My House",
-                subtitle = house?.inviteCode?.let { "Invite code: $it" }
-            )
-        },
         bottomBar = {
             AppNavigationBar(
                 destinations = destinations,
@@ -53,13 +51,32 @@ fun HomeScreen(
             )
         }
     ) { padding ->
-        //placeholder
+        Box(Modifier.fillMaxSize().padding(padding)) {
+            when (current) {
+                "planning" -> MealPlanScreen(houseId = houseId)
+                "recipes" -> RecipeScreen(houseId = houseId)
+                "grocery" -> GroceryScreen(houseId = houseId, house = house)
+                "house" -> HouseTab(house = house)
+            }
+        }
+    }
+}
+
+@Composable
+private fun HouseTab(house: House?) {
+    Scaffold(
+        topBar = {
+            AppTopAppBar(
+                title = house?.name ?: "My House",
+                subtitle = house?.inviteCode?.let { "Invite code: $it" }
+            )
+        }
+    ) { padding ->
         Box(
             Modifier.fillMaxSize().padding(padding),
             contentAlignment = Alignment.Center
         ) {
-            val label = destinations.first { it.route == current }.label
-            Text("$label — coming soon")
+            Text(house?.let { "Invite code: ${it.inviteCode}" } ?: "Loading…")
         }
     }
 }
