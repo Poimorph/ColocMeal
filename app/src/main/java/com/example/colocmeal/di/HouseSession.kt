@@ -21,5 +21,6 @@ class HouseSession(
         container.recipeRepository.startSync(houseId, uid)
         container.mealPlanRepository.startSync(houseId, weekStart)
         container.groceryRepository.startSync(houseId)
+        container.ingredientRepository.startSync(houseId)
     }
 }

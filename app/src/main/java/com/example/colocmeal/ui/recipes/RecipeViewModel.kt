@@ -4,21 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.colocmeal.domain.model.Aisle
+import com.example.colocmeal.domain.model.Ingredient
 import com.example.colocmeal.domain.model.Recipe
 import com.example.colocmeal.domain.repository.AuthRepository
+import com.example.colocmeal.domain.repository.IngredientRepository
 import com.example.colocmeal.domain.repository.RecipeRepository
 import com.example.colocmeal.domain.repository.UserRepository
+import com.example.colocmeal.domain.utils.normalizeName
 import com.example.colocmeal.ui.container
+import com.example.colocmeal.ui.launchSafe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 class RecipeViewModel(
     private val houseId: String,
     private val repository: RecipeRepository,
+    private val ingredientRepository: IngredientRepository,
     authRepository: AuthRepository,
     userRepository: UserRepository,
 ) : ViewModel() {
@@ -30,23 +36,49 @@ class RecipeViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
 
     val recipes: StateFlow<List<Recipe>> =
-        repository.observeSharedRecipes(houseId)
+        combine(
+            repository.observeSharedRecipes(houseId),
+            repository.observePrivateRecipes(uid)
+        ) { shared, mine -> (shared + mine).distinctBy { it.id } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun addRecipe(name: String, description: String) {
+    /** House-wide ingredient catalog (name + aisle), for the recipe ingredient picker. */
+    val catalog: StateFlow<List<Ingredient>> =
+        ingredientRepository.observeIngredients(houseId)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Registers a new ingredient (or refreshes its aisle) in the house catalog. */
+    fun createIngredient(name: String, aisle: Aisle) {
         val trimmed = name.trim()
         if (trimmed.isEmpty()) return
-        viewModelScope.launch {
+        launchSafe {
+            ingredientRepository.upsertIngredient(
+                Ingredient(
+                    id = "",
+                    houseId = houseId,
+                    name = trimmed,
+                    nameNormalized = normalizeName(trimmed),
+                    aisle = aisle,
+                )
+            )
+        }
+    }
+
+    fun addRecipe(name: String, description: String, ingredients: List<String>, isShared: Boolean) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        val cleanIngredients = ingredients.map { it.trim() }.filter { it.isNotEmpty() }
+        launchSafe {
             repository.upsertRecipe(
                 Recipe(
                     id = UUID.randomUUID().toString(),
                     name = trimmed,
                     description = description.ifBlank { null },
-                    ingredients = emptyList(),
+                    ingredients = cleanIngredients,
                     authorId = uid,
                     authorName = displayName.value,
-                    houseId = houseId,
-                    isShared = true,
+                    houseId = if (isShared) houseId else null,
+                    isShared = isShared,
                 )
             )
         }
@@ -54,7 +86,7 @@ class RecipeViewModel(
 
     fun deleteRecipe(recipeId: String) {
         val recipe = recipes.value.find { it.id == recipeId } ?: return
-        viewModelScope.launch { repository.deleteRecipe(recipe) }
+        launchSafe { repository.deleteRecipe(recipe) }
     }
 
     companion object {
@@ -63,6 +95,7 @@ class RecipeViewModel(
                 RecipeViewModel(
                     houseId,
                     container().recipeRepository,
+                    container().ingredientRepository,
                     container().authRepository,
                     container().userRepository,
                 )

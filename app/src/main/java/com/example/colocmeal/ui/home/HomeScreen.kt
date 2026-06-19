@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.colocmeal.domain.model.House
-import com.example.colocmeal.ui.components.AppNavigationBar
-import com.example.colocmeal.ui.components.AppTopAppBar
-import com.example.colocmeal.ui.components.NavDestination
+import com.example.colocmeal.ui.components.navigation.AppNavigationBar
+import com.example.colocmeal.ui.components.navigation.AppTopAppBar
+import com.example.colocmeal.ui.components.navigation.NavDestination
 import com.example.colocmeal.ui.grocery.GroceryScreen
 import com.example.colocmeal.ui.planning.MealPlanScreen
 import com.example.colocmeal.ui.recipes.RecipeScreen

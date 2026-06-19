@@ -1,8 +1,10 @@
 package com.example.colocmeal.ui.grocery
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -13,8 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.colocmeal.domain.model.Aisle
 import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.model.House
+import com.example.colocmeal.ui.components.grocery.AppChip
+import com.example.colocmeal.ui.components.grocery.ChipKind
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +66,8 @@ fun GroceryScreen(
         if (showAddDialog) {
             AddItemDialog(
                 onDismiss = { showAddDialog = false },
-                onConfirm = { name ->
-                    viewModel.addItem(name)
+                onConfirm = { name, aisle ->
+                    viewModel.addItem(name, aisle)
                     showAddDialog = false
                 }
             )
@@ -135,24 +140,43 @@ fun GroceryItemRow(
 @Composable
 fun AddItemDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (name: String, aisle: Aisle) -> Unit
 ) {
     var itemName by remember { mutableStateOf("") }
+    var selectedAisle by remember { mutableStateOf(Aisle.OTHER) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Ajouter un article") },
         text = {
-            OutlinedTextField(
-                value = itemName,
-                onValueChange = { itemName = it },
-                label = { Text("Nom de l'article") },
-                singleLine = true
-            )
+            Column {
+                OutlinedTextField(
+                    value = itemName,
+                    onValueChange = { itemName = it },
+                    label = { Text("Nom de l'article") },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Rayon", style = MaterialTheme.typography.labelMedium)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Aisle.entries.forEach { aisle ->
+                        AppChip(
+                            label = "${aisle.emoji} ${aisle.displayName}",
+                            kind = ChipKind.FILTER,
+                            selected = aisle == selectedAisle,
+                            onClick = { selectedAisle = aisle }
+                        )
+                    }
+                }
+            }
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(itemName) },
+                onClick = { onConfirm(itemName, selectedAisle) },
                 enabled = itemName.isNotBlank()
             ) {
                 Text("Ajouter")

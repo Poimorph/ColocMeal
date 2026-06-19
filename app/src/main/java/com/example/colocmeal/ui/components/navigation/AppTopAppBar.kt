@@ -1,4 +1,4 @@
-package com.example.colocmeal.ui.components
+package com.example.colocmeal.ui.components.navigation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope

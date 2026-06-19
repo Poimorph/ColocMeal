@@ -2,17 +2,20 @@ package com.example.colocmeal.data.mapper
 
 import com.example.colocmeal.data.local.entity.GroceryItemEntity
 import com.example.colocmeal.data.local.entity.HouseEntity
+import com.example.colocmeal.data.local.entity.IngredientEntity
 import com.example.colocmeal.data.local.entity.MealPlanEntity
 import com.example.colocmeal.data.local.entity.RecipeEntity
 import com.example.colocmeal.data.local.entity.UserEntity
 import com.example.colocmeal.data.remote.dto.GroceryItemDto
 import com.example.colocmeal.data.remote.dto.HouseDto
+import com.example.colocmeal.data.remote.dto.IngredientDto
 import com.example.colocmeal.data.remote.dto.MealPlanDto
 import com.example.colocmeal.data.remote.dto.RecipeDto
 import com.example.colocmeal.data.remote.dto.UserDto
 import com.example.colocmeal.domain.model.Aisle
 import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.model.House
+import com.example.colocmeal.domain.model.Ingredient
 import com.example.colocmeal.domain.model.MealPlan
 import com.example.colocmeal.domain.model.Recipe
 import com.example.colocmeal.domain.model.Source
@@ -215,4 +218,37 @@ fun GroceryItem.toDto(): GroceryItemDto = GroceryItemDto(
     isChecked = isChecked,
     source = source.name,
     addedBy = addedBy
+)
+
+// Ingredient
+fun IngredientEntity.toDomain(): Ingredient = Ingredient(
+    id = id,
+    houseId = houseId,
+    name = name,
+    nameNormalized = nameNormalized,
+    aisle = aisle
+)
+
+fun Ingredient.toEntity(): IngredientEntity = IngredientEntity(
+    id = id,
+    houseId = houseId,
+    name = name,
+    nameNormalized = nameNormalized,
+    aisle = aisle
+)
+
+fun IngredientDto.toDomain(): Ingredient = Ingredient(
+    id = id,
+    houseId = houseId,
+    name = name,
+    nameNormalized = nameNormalized,
+    aisle = Aisle.valueOf(aisle)
+)
+
+fun Ingredient.toDto(): IngredientDto = IngredientDto(
+    id = id,
+    houseId = houseId,
+    name = name,
+    nameNormalized = nameNormalized,
+    aisle = aisle.name
 )

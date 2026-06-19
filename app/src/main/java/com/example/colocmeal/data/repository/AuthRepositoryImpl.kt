@@ -14,8 +14,6 @@ class AuthRepositoryImpl(
     private val userRepository: UserRepository
 ) : AuthRepository {
 
-class AuthRepositoryImpl (val auth : FirebaseAuth, val userRepository: UserRepository): AuthRepository {
-
     override val currentUid: String?
         get() = auth.currentUser?.uid
 

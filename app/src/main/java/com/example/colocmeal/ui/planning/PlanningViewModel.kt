@@ -4,18 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.colocmeal.domain.model.Aisle
+import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.model.MealPlan
 import com.example.colocmeal.domain.model.Recipe
+import com.example.colocmeal.domain.model.Source
 import com.example.colocmeal.domain.repository.AuthRepository
+import com.example.colocmeal.domain.repository.GroceryRepository
+import com.example.colocmeal.domain.repository.IngredientRepository
 import com.example.colocmeal.domain.repository.MealPlanRepository
 import com.example.colocmeal.domain.repository.RecipeRepository
 import com.example.colocmeal.domain.repository.UserRepository
+import com.example.colocmeal.domain.utils.normalizeName
 import com.example.colocmeal.ui.container
+import com.example.colocmeal.ui.launchSafe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -25,6 +31,8 @@ class PlanningViewModel(
     private val houseId: String,
     private val mealPlanRepository: MealPlanRepository,
     recipeRepository: RecipeRepository,
+    private val groceryRepository: GroceryRepository,
+    private val ingredientRepository: IngredientRepository,
     authRepository: AuthRepository,
     userRepository: UserRepository,
 ) : ViewModel() {
@@ -47,7 +55,7 @@ class PlanningViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun addMeal(dayOfWeek: Int, recipe: Recipe) {
-        viewModelScope.launch {
+        launchSafe {
             mealPlanRepository.upsertMealPlan(
                 MealPlan(
                     id = UUID.randomUUID().toString(),
@@ -60,12 +68,31 @@ class PlanningViewModel(
                     cookName = displayName.value,
                 )
             )
+            // Auto-generate the recipe's ingredients into the shopping list.
+            // addOrMergeItem dedups by normalized name, so shared ingredients won't duplicate.
+            recipe.ingredients.forEach { ingredientName ->
+                val normalized = normalizeName(ingredientName)
+                val aisle = ingredientRepository.findByNormalizedName(houseId, normalized)?.aisle
+                    ?: Aisle.OTHER
+                groceryRepository.addOrMergeItem(
+                    GroceryItem(
+                        id = "",
+                        houseId = houseId,
+                        name = ingredientName,
+                        nameNormalized = normalized,
+                        aisle = aisle,
+                        isChecked = false,
+                        source = Source.AUTO,
+                        addedBy = uid,
+                    )
+                )
+            }
         }
     }
 
     fun deleteMeal(mealId: String) {
         val meal = weeklyPlan.value.find { it.id == mealId } ?: return
-        viewModelScope.launch { mealPlanRepository.deleteMealPlan(meal) }
+        launchSafe { mealPlanRepository.deleteMealPlan(meal) }
     }
 
     companion object {
@@ -75,6 +102,8 @@ class PlanningViewModel(
                     houseId,
                     container().mealPlanRepository,
                     container().recipeRepository,
+                    container().groceryRepository,
+                    container().ingredientRepository,
                     container().authRepository,
                     container().userRepository,
                 )

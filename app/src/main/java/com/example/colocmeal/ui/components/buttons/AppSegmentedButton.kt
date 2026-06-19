@@ -1,4 +1,4 @@
-package com.example.colocmeal.ui.components
+package com.example.colocmeal.ui.components.buttons
 
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults

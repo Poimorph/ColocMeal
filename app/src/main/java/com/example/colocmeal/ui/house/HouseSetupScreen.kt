@@ -36,12 +36,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.colocmeal.ui.components.AppSegmentedButton
+import com.example.colocmeal.ui.components.buttons.AppSegmentedButton
 import com.example.colocmeal.ui.components.buttons.AppButton
 import com.example.colocmeal.ui.components.cards.AppOutlinedCard
 import com.example.colocmeal.ui.components.inputs.AppTextField

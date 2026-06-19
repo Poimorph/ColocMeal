@@ -95,23 +95,16 @@ private fun ButtonContent(
     leadingIcon: ImageVector?,
     enabled: Boolean
 ) {
-    if (!enabled) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(16.dp),
-            strokeWidth = 2.dp
+    if (leadingIcon != null) {
+        Icon(
+            imageVector = leadingIcon,
+            contentDescription = null
         )
-    } else {
-        if (leadingIcon != null) {
-            Icon(
-                imageVector = leadingIcon,
-                contentDescription = null
-            )
 
-            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-        }
-
-        Text(text = label)
+        Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
     }
+
+    Text(text = label)
 }
 
 @Composable

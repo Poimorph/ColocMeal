@@ -9,12 +9,12 @@ import com.example.colocmeal.domain.model.GroceryItem
 import com.example.colocmeal.domain.model.Source
 import com.example.colocmeal.domain.repository.AuthRepository
 import com.example.colocmeal.domain.repository.GroceryRepository
+import com.example.colocmeal.domain.utils.normalizeName
 import com.example.colocmeal.ui.container
+import com.example.colocmeal.ui.launchSafe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import java.text.Normalizer
 
 class GroceryViewModel(
     private val houseId: String,
@@ -26,17 +26,17 @@ class GroceryViewModel(
         repository.observeItems(houseId)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun addItem(name: String) {
+    fun addItem(name: String, aisle: Aisle) {
         val trimmed = name.trim()
         if (trimmed.isEmpty()) return
-        viewModelScope.launch {
+        launchSafe {
             repository.addOrMergeItem(
                 GroceryItem(
                     id = "",
                     houseId = houseId,
                     name = trimmed,
-                    nameNormalized = normalize(trimmed),
-                    aisle = Aisle.OTHER,
+                    nameNormalized = normalizeName(trimmed),
+                    aisle = aisle,
                     isChecked = false,
                     source = Source.MANUAL,
                     addedBy = authRepository.currentUid.orEmpty(),
@@ -47,17 +47,13 @@ class GroceryViewModel(
 
     fun toggleItemChecked(itemId: String, isChecked: Boolean) {
         val item = items.value.find { it.id == itemId } ?: return
-        viewModelScope.launch { repository.setChecked(item, isChecked) }
+        launchSafe { repository.setChecked(item, isChecked) }
     }
 
     fun deleteItem(itemId: String) {
         val item = items.value.find { it.id == itemId } ?: return
-        viewModelScope.launch { repository.deleteItem(item) }
+        launchSafe { repository.deleteItem(item) }
     }
-
-    private fun normalize(value: String): String =
-        Normalizer.normalize(value.lowercase(), Normalizer.Form.NFD)
-            .replace("\\p{Mn}+".toRegex(), "")
 
     companion object {
         fun factory(houseId: String) = viewModelFactory {
