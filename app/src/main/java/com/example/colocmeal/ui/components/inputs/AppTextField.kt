@@ -1,5 +1,7 @@
 package com.example.colocmeal.ui.components.inputs
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +22,33 @@ fun AppTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = Int.MAX_VALUE
-){
-    // TODO : Visual Aspect
-    OutlinedTextField(value, onValueChange, modifier, label={ Text(label) }, visualTransformation=visualTransformation)
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        label = {
+            Text(text = label)
+        },
+        supportingText = supportingText?.let { message ->
+            {
+                Text(text = message)
+            }
+        },
+        isError = isError,
+        trailingIcon = trailingIcon?.let { icon ->
+            {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
+        },
+        visualTransformation = visualTransformation,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        ),
+        singleLine = maxLines == 1,
+        maxLines = maxLines
+    )
 }
